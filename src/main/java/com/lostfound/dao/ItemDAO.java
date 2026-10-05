@@ -99,6 +99,53 @@ public class ItemDAO {
         }
         return list;
     }
+        public List<Item> findByUser(int userId) throws SQLException {
+        String sql = "SELECT id, user_id, type, title, category, description, "
+                + "color, location, item_date, status, image_path "
+                + "FROM items WHERE user_id = ? ORDER BY created_at DESC";
+        List<Item> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    /** Closes the item only if it belongs to this user and is still ACTIVE. */
+    public boolean close(int itemId, int userId) throws SQLException {
+        String sql = "UPDATE items SET status = 'CLOSED' "
+                + "WHERE id = ? AND user_id = ? AND status = 'ACTIVE'";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, itemId);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /** Updates the item only if it belongs to this user and is still ACTIVE. */
+    public boolean update(Item item) throws SQLException {
+        String sql = "UPDATE items SET title = ?, category = ?, description = ?, "
+                + "color = ?, location = ?, item_date = ? "
+                + "WHERE id = ? AND user_id = ? AND status = 'ACTIVE'";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, item.getTitle());
+            ps.setString(2, item.getCategory());
+            ps.setString(3, item.getDescription());
+            ps.setString(4, item.getColor());
+            ps.setString(5, item.getLocation());
+            ps.setDate(6, Date.valueOf(item.getItemDate()));
+            ps.setInt(7, item.getId());
+            ps.setInt(8, item.getUserId());
+            return ps.executeUpdate() > 0;
+        }
+    }
 
     private Item mapRow(ResultSet rs) throws SQLException {
         Item i = new Item();
