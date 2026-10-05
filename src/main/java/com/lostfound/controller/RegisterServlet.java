@@ -17,10 +17,10 @@ public class RegisterServlet extends HttpServlet {
     private final UserDAO userDAO = new UserDAO();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        resp.sendRedirect(req.getContextPath() + "/login");
-    }
+protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+    req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req, resp);
+}
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -49,7 +49,7 @@ public class RegisterServlet extends HttpServlet {
                 u.setEmail(email);
                 u.setPassword(PasswordUtil.hash(password));
                 userDAO.create(u);
-                resp.sendRedirect(req.getContextPath() + "/register?success=1");
+                resp.sendRedirect(req.getContextPath() + "/login");
                 return;
             }
         } catch (SQLException e) {
