@@ -7,17 +7,23 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemDAO {
 
-    public void create(Item item) throws SQLException {
+    private static final String COLUMNS =
+            "id, user_id, type, title, category, description, "
+            + "color, location, item_date, status, image_path";
+
+    /** Saves a new item and returns its generated id. */
+    public int create(Item item) throws SQLException {
         String sql = "INSERT INTO items "
                 + "(user_id, type, title, category, description, color, location, item_date) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, item.getUserId());
             ps.setString(2, item.getType());
             ps.setString(3, item.getTitle());
@@ -27,13 +33,15 @@ public class ItemDAO {
             ps.setString(7, item.getLocation());
             ps.setDate(8, Date.valueOf(item.getItemDate()));
             ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                return keys.next() ? keys.getInt(1) : 0;
+            }
         }
     }
 
     public List<Item> findAllActive() throws SQLException {
-        String sql = "SELECT id, user_id, type, title, category, description, "
-                + "color, location, item_date, status, image_path "
-                + "FROM items WHERE status = 'ACTIVE' ORDER BY created_at DESC";
+        String sql = "SELECT " + COLUMNS
+                + " FROM items WHERE status = 'ACTIVE' ORDER BY created_at DESC";
         List<Item> list = new ArrayList<>();
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -44,10 +52,9 @@ public class ItemDAO {
         }
         return list;
     }
-        public Item findById(int id) throws SQLException {
-        String sql = "SELECT id, user_id, type, title, category, description, "
-                + "color, location, item_date, status, image_path "
-                + "FROM items WHERE id = ?";
+
+    public Item findById(int id) throws SQLException {
+        String sql = "SELECT " + COLUMNS + " FROM items WHERE id = ?";
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -57,13 +64,12 @@ public class ItemDAO {
         }
     }
 
+    /** Active items matching the filters. Empty filters are ignored. */
     public List<Item> search(String keyword, String type,
                              String category, String location) throws SQLException {
 
         StringBuilder sql = new StringBuilder(
-                "SELECT id, user_id, type, title, category, description, "
-                + "color, location, item_date, status, image_path "
-                + "FROM items WHERE status = 'ACTIVE'");
+                "SELECT " + COLUMNS + " FROM items WHERE status = 'ACTIVE'");
         List<Object> params = new ArrayList<>();
 
         if (!keyword.isEmpty()) {
@@ -99,14 +105,32 @@ public class ItemDAO {
         }
         return list;
     }
-        public List<Item> findByUser(int userId) throws SQLException {
-        String sql = "SELECT id, user_id, type, title, category, description, "
-                + "color, location, item_date, status, image_path "
-                + "FROM items WHERE user_id = ? ORDER BY created_at DESC";
+
+    /** All items reported by one user, newest first. */
+    public List<Item> findByUser(int userId) throws SQLException {
+        String sql = "SELECT " + COLUMNS
+                + " FROM items WHERE user_id = ? ORDER BY created_at DESC";
         List<Item> list = new ArrayList<>();
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+    /** ACTIVE items of one type ("LOST" or "FOUND"), used by the matching engine. */
+    public List<Item> findActiveByType(String type) throws SQLException {
+        String sql = "SELECT " + COLUMNS
+                + " FROM items WHERE type = ? AND status = 'ACTIVE'";
+        List<Item> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, type);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
@@ -147,6 +171,7 @@ public class ItemDAO {
         }
     }
 
+    /** Turns one database row into one Item object. */
     private Item mapRow(ResultSet rs) throws SQLException {
         Item i = new Item();
         i.setId(rs.getInt("id"));

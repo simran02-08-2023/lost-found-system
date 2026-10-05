@@ -2,6 +2,8 @@ package com.lostfound.controller;
 
 import com.lostfound.dao.ItemDAO;
 import com.lostfound.model.Item;
+import com.lostfound.service.MatchFinderService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -68,9 +70,19 @@ public class ReportItemServlet extends HttpServlet {
                 item.setColor(color);
                 item.setLocation(location);
                 item.setItemDate(date);
-                itemDAO.create(item);
+                                int newId = itemDAO.create(item);
+                item.setId(newId);
 
-                resp.sendRedirect(req.getContextPath() + "/items?reported=1");
+                // a matching problem must never stop the report from being saved
+                int found = 0;
+                try {
+                    found = new MatchFinderService().findMatchesFor(item);
+                } catch (SQLException e) {
+                    log("Matching failed", e);
+                }
+
+                resp.sendRedirect(req.getContextPath()
+                        + (found > 0 ? "/matches?newMatches=" + found : "/items?reported=1"));
                 return;
             } catch (SQLException e) {
                 log("Could not save item", e);
