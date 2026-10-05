@@ -17,12 +17,22 @@ public class ItemListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        String q = clean(req.getParameter("q"));
+        String type = clean(req.getParameter("type"));
+        String category = clean(req.getParameter("category"));
+        String location = clean(req.getParameter("location"));
+
         try {
-            req.setAttribute("items", itemDAO.findAllActive());
+            req.setAttribute("items", itemDAO.search(q, type, category, location));
         } catch (SQLException e) {
             log("Could not load items", e);
             req.setAttribute("error", "Could not load items right now.");
         }
         req.getRequestDispatcher("/WEB-INF/views/items.jsp").forward(req, resp);
+    }
+
+    private static String clean(String s) {
+        return s == null ? "" : s.trim();
     }
 }
