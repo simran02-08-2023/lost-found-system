@@ -7,6 +7,7 @@
     <title>Login - Lost &amp; Found</title>
 </head>
 <body>
+    <%@ include file="/WEB-INF/views/navbar.jspf" %>
     <h1>Login</h1>
 
     <c:if test="${not empty error}">

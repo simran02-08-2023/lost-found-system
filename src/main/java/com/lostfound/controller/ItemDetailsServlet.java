@@ -1,5 +1,6 @@
 package com.lostfound.controller;
 
+import com.lostfound.dao.ClaimDAO;
 import com.lostfound.dao.ItemDAO;
 import com.lostfound.model.Item;
 import jakarta.servlet.ServletException;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
 public class ItemDetailsServlet extends HttpServlet {
 
     private final ItemDAO itemDAO = new ItemDAO();
+    private final ClaimDAO claimDAO = new ClaimDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -36,6 +38,11 @@ public class ItemDetailsServlet extends HttpServlet {
             if (item == null || (!"ACTIVE".equals(item.getStatus()) && !isOwner)) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
+            }
+
+            // the finder can see the claims on their own FOUND item
+            if (isOwner && "FOUND".equals(item.getType())) {
+                req.setAttribute("itemClaims", claimDAO.findByItem(id));
             }
 
             req.setAttribute("item", item);

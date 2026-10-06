@@ -13,7 +13,6 @@ public class CloseItemServlet extends HttpServlet {
 
     private final ItemDAO itemDAO = new ItemDAO();
 
-    // POST only: a plain link must never be able to close a report
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {

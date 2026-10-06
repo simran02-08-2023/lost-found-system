@@ -7,6 +7,7 @@
     <title>Dashboard - Lost &amp; Found</title>
 </head>
 <body>
+    <%@ include file="/WEB-INF/views/navbar.jspf" %>
     <h1>Hello, <c:out value="${sessionScope.userName}"/>!</h1>
     <p>You are logged in. Your role: <c:out value="${sessionScope.role}"/></p>
 
@@ -14,7 +15,8 @@
         <a href="${pageContext.request.contextPath}/report-item">Report lost/found item</a> |
         <a href="${pageContext.request.contextPath}/items">Browse items</a> |
         <a href="${pageContext.request.contextPath}/my-reports">My reports</a> |
-        <a href="${pageContext.request.contextPath}/matches">Matches</a>
+        <a href="${pageContext.request.contextPath}/matches">Matches</a> |
+        <a href="${pageContext.request.contextPath}/claims">My claims</a> |
     </p>
 
     <c:if test="${sessionScope.role == 'ADMIN'}">

@@ -7,6 +7,7 @@
     <title>Items - Lost &amp; Found</title>
 </head>
 <body>
+    <%@ include file="/WEB-INF/views/navbar.jspf" %>
     <h1>Browse items</h1>
 
     <c:if test="${not empty param.reported}">

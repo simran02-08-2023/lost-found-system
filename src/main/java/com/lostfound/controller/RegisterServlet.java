@@ -2,6 +2,7 @@ package com.lostfound.controller;
 
 import com.lostfound.dao.UserDAO;
 import com.lostfound.model.User;
+
 import com.lostfound.util.PasswordUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,7 +14,7 @@ import java.sql.SQLException;
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
-
+   
     private final UserDAO userDAO = new UserDAO();
 
     @Override

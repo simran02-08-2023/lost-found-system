@@ -7,13 +7,11 @@
     <title>My Reports - Lost &amp; Found</title>
 </head>
 <body>
+    <%@ include file="/WEB-INF/views/navbar.jspf" %>
     <h1>My reports</h1>
 
     <c:if test="${not empty param.closed}">
         <p style="color:green">Report closed.</p>
-    </c:if>
-    <c:if test="${not empty param.updated}">
-        <p style="color:green">Report updated.</p>
     </c:if>
     <c:if test="${not empty param.failed}">
         <p style="color:red">That report could not be closed.</p>
@@ -42,7 +40,6 @@
                     <td>
                         <a href="${pageContext.request.contextPath}/item-details?id=${item.id}">View</a>
                         <c:if test="${item.status == 'ACTIVE'}">
-                            | <a href="${pageContext.request.contextPath}/edit-item?id=${item.id}">Edit</a>
                             <form action="${pageContext.request.contextPath}/close-item"
                                   method="post" style="display:inline"
                                   onsubmit="return confirm('Close this report?');">

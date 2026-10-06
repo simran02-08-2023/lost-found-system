@@ -44,6 +44,7 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("role", user.getRole());
                 session.setMaxInactiveInterval(30 * 60); // 30 minutes
 
+
                 resp.sendRedirect(req.getContextPath() + "/dashboard");
                 return;
             }

@@ -1,0 +1,18 @@
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+<nav class="nav">
+    <a class="brand" href="${pageContext.request.contextPath}/dashboard">Lost &amp; Found</a>
+    <c:if test="${not empty sessionScope.userId}">
+        <span>
+            <a href="${pageContext.request.contextPath}/report-item">Report</a>
+            <a href="${pageContext.request.contextPath}/items">Browse</a>
+            <a href="${pageContext.request.contextPath}/my-reports">My reports</a>
+            <a href="${pageContext.request.contextPath}/matches">Matches</a>
+            <a href="${pageContext.request.contextPath}/claims">My claims</a>
+            <c:if test="${sessionScope.role == 'ADMIN'}">
+                <a href="${pageContext.request.contextPath}/admin/dashboard">Admin</a>
+            </c:if>
+            <a href="${pageContext.request.contextPath}/logout">Logout</a>
+        </span>
+    </c:if>
+</nav>
+<div class="container">

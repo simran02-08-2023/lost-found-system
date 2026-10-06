@@ -3,7 +3,6 @@ package com.lostfound.controller;
 import com.lostfound.dao.ItemDAO;
 import com.lostfound.model.Item;
 import com.lostfound.service.MatchFinderService;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -70,7 +69,8 @@ public class ReportItemServlet extends HttpServlet {
                 item.setColor(color);
                 item.setLocation(location);
                 item.setItemDate(date);
-                                int newId = itemDAO.create(item);
+
+                int newId = itemDAO.create(item);
                 item.setId(newId);
 
                 // a matching problem must never stop the report from being saved

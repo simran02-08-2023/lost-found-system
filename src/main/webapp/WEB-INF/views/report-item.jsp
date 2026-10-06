@@ -7,6 +7,7 @@
     <title>Report Item - Lost &amp; Found</title>
 </head>
 <body>
+    <%@ include file="/WEB-INF/views/navbar.jspf" %>
     <h1>Report an item</h1>
 
     <c:if test="${not empty error}">
